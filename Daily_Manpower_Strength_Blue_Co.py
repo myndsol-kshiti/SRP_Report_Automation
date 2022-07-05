@@ -42,4 +42,4 @@ Daily_manpower['Total'] = Daily_manpower['A'] + Daily_manpower['B'] + Daily_manp
 # Daily_manpower = Daily_manpower.drop_duplicates()
 # Daily_manpower = Daily_manpower.dropna()
 print(Daily_manpower)
-# Daily_manpower.to_excel(r'Group_Attendance_Report.xlsx')
+# Daily_manpower.to_excel(r'Daily_Manpower_Strength_Blue_Co.xlsx')
