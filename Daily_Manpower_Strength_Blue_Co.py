@@ -1,45 +1,66 @@
-
 import pandas as pd
 import numpy as np
 import datetime
 from datetime import datetime, date
 
-Attendance_report = pd.read_excel(r"C:\Users\kshiti.sinha\Desktop\projects\Shri Ram Pistons Reports\input\EmployeeData.xlsx",
+Attendance_report = pd.read_excel(r"C:\Users\hrithik.chauhan\Downloads\EmployeeData.xlsx",
                                   sheet_name="Employee Data Report")
-Daily_Attendance_Report = pd.read_excel(r"C:\Users\kshiti.sinha\Desktop\projects\Shri Ram Pistons Reports\input\Daily_Attendance_Report.xlsx")
-Daily_Attendance_Report['Shift'] = Daily_Attendance_Report['Shift Name'].astype(str)
 
-Daily_Attendance_Report.loc[Daily_Attendance_Report['Shift'] == "06:00 M to 02:30 PM"] == "A"
-# for i, row in Daily_Attendance_Report.iterrows():
-#     if row['Shift'] == "06:00 M to 02:30 PM":
-#         row['Shift'] = 'A'
-#     elif row['Shift'] == "14:00 PM to 22:30 PM":
-#         row['Shift'] = 'B'
-#     elif row['Shift'] == "22:00 PM to 06:30 AM":
-#         row['Shift'] = 'C'
-#     elif row['Shift'] == "09:00 AM to 17:30 PM":
-#         row['Shift'] = 'G'
-#     else:
-#         row['Shift'] = 'no shift'
+Daily_manpower = pd.DataFrame(columns=['DEPARTMENT1', 'On Roll', 'A', 'G', 'B', 'C', 'Total'])
 
-Daily_Attendance_Report.to_excel('daily.xlsx')
-Daily_manpower = pd.DataFrame(columns=['On Roll', 'A', 'G', 'B', 'C', 'Total'])
+daily_attendance_old = pd.read_excel(r"C:\Users\hrithik.chauhan\Downloads\Daily_Attendance_Report.xlsx",
+                                     sheet_name="Sheet1")
+# Daily_manpower['Dept.'] = Attendance_report['DEPARTMENT'].drop_duplicates()
+# Daily_manpower['dept1'] = " "
 
-# Daily_manpower['Dept.'] = Attendance_report['DEPARTMENT'].drop_duplicates().dropna()
-
+Daily_manpower['A'] = " "
+Daily_manpower['G'] = " "
+Daily_manpower['B'] = " "
+Daily_manpower['C'] = " "
+Daily_manpower['Total'] = " "
 count = Attendance_report['DEPARTMENT'].value_counts()
 Daily_manpower['On Roll'] = count
-Daily_manpower.index.names = ['Dept.']
+Daily_manpower['DEPARTMENT'] = Daily_manpower.index
+Daily_manpower.index.names = ['DEPARTMENT1']
 
+Daily_manpower.to_excel(r'C:\Users\hrithik.chauhan\Desktop\daily.xlsx')
+# Daily_manpower['dept1'] = Daily_manpower['Dept.']
+df = daily_attendance_old
+df.groupby(["DEPARTMENT", "Shift Duration"]).size()
+ab = df.groupby(["DEPARTMENT", "Shift Duration"]).size().reset_index(name="Time")
+ab.rename(columns={'Shift Duration': 'Shift_Duration'}, inplace=True)
+print(ab)
+ab.to_excel(r"C:\Users\hrithik.chauhan\Desktop\Book1.xlsx")
+#  df.groupby(["Group", "Size"]).size().reset_index(name="Time")
+# df.groupby(["Group", "Size"]).size().reset_index(name="Time")
+inner_join = pd.merge(Daily_manpower,
+                      ab,
+                      on='DEPARTMENT',
+                      how='left')
 
-# Daily_manpower['On Roll'] = ['35','37','45','80']
-# Daily_manpower['A'] = ['21','13','10','16']
-# Daily_manpower['B'] = ['21','13','10','16']
-# Daily_manpower['G'] = ['21','13','10','16']
-# Daily_manpower['C'] = ['21','13','10','16']
-Daily_manpower['Total'] = Daily_manpower['A'] + Daily_manpower['B'] + Daily_manpower['C'] + Daily_manpower['G']
-# Daily_manpower = Daily_manpower['Dept.']
-# Daily_manpower = Daily_manpower.drop_duplicates()
-# Daily_manpower = Daily_manpower.dropna()
+inner_join.to_excel(r"C:\Users\hrithik.chauhan\Desktop\demo.xlsx")
+inner_join
+for j, row in Daily_manpower.iterrows():
+
+    for i, row1 in inner_join.iterrows():
+
+        if row1['DEPARTMENT'] == row['DEPARTMENT']:
+            if row1['Shift_Duration'] == "06:00am-02:30pm":
+                row['A'] = row1['Time']
+                Daily_manpower.loc[j, 'A'] = row1['Time']
+            elif row1['Shift_Duration'] == "02:00pm-10:30pm":
+                row['B'] = row1['Time']
+                Daily_manpower.loc[j, 'B'] = row1['Time']
+            elif row1['Shift_Duration'] == "10:00pm-06:30am":
+                row['C'] = row1['Time']
+                Daily_manpower.loc[j, 'C'] = row1['Time']
+            elif row1['Shift_Duration'] == "09:00am-05:30pm":
+                row['G'] = row1['Time']
+                Daily_manpower.loc[j, 'G'] = row1['Time']
+            print("1st loop", row['DEPARTMENT'], row['A'], row['B'])
+
 print(Daily_manpower)
-# Daily_manpower.to_excel(r'Daily_Manpower_Strength_Blue_Co.xlsx')
+column_names = ['A', 'B', 'G', 'C']
+Daily_manpower['Total'] = Daily_manpower[column_names].sum(axis=1)
+Daily_manpower.to_excel(r'C:\Users\hrithik.chauhan\Desktop\daily.xlsx',
+                        columns=['DEPARTMENT', 'On Roll', 'A', 'G', 'B', 'C', 'Total'])

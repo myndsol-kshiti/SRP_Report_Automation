@@ -19,7 +19,6 @@ daily_attendance_new['DATE'] = daily_attendance_old['Date'].dt.date.astype(str)
 
 for i, row in daily_attendance_new.iterrows():
     if row['Shift_Name'] == "06:00 AM to 02:30 PM":
-
         row['SHIFT'] = "A"
     elif row['Shift_Name'] == "14:00 PM to 22:30 PM":
         row['SHIFT'] = "B"
